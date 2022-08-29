@@ -23,12 +23,11 @@ let obj = {
 
 
 function novoParticipante () {
-    /*const x = document.querySelector(".tela-inicial input").value;*/
     const promessa = axios.post("https://mock-api.driven.com.br/api/v6/uol/participants", obj);
     promessa.then(entrou);
     promessa.catch(naoentrou);
-    const idInterval = setInterval(checaStatus, 5000);
-    const idInterval2 = setInterval(buscarMensagens, 3000);
+    const idInterval = setInterval(checaStatus, 5000);        //checa o status a cada 5 sec
+    const idInterval2 = setInterval(buscarMensagens, 3000);   //busca mensagens novas a cada 3 sec
     return idInterval, idInterval2;
 }
 
@@ -56,7 +55,7 @@ function checaStatus(){
 function online (resposta){
     //buscarMensagens();
 }
-function offline(erro){
+function offline(erro){             //desconecta o usuário offline e recarrega a página
     console.log(erro);
     clearInterval(idInterval);
     alert('Você foi desconectado por inatividade');
@@ -69,26 +68,23 @@ function buscarMensagens(){
 }
 
 function mensagens(resposta) {
-    renderizaMensagens(resposta.data);
+    renderizaMensagens(resposta.data);   //renderiza as mensagens na tela
 }
 
 function mensagemfalhou (erro) {
     console.log(erro);
 }
 
-function renderizaMensagens(listaMensagens){
+function renderizaMensagens(listaMensagens){     
     let ultimaMsg = listaMensagens[99];
     mensagensAntigas.push(ultimaMsg);
-    //console.log(listaMensagens);
-    //console.log(mensagensAntigas[mensagensAntigas.length - 2]);
-    //console.log(mensagensAntigas[mensagensAntigas.length - 1]);
     let mensagemNova = document.querySelector('.tela-mensagens');
     if (msgIgual(mensagensAntigas[mensagensAntigas.length - 2],mensagensAntigas[mensagensAntigas.length - 1])){
     if (ultimaMsg.type === 'status'){
         mensagemNova.innerHTML += entraSai(ultimaMsg);
     }
     if (ultimaMsg.type === 'message'){
-        if (ultimaMsg.to !== 'Todos'){
+        if (ultimaMsg.to !== 'Todos'){ // filtra as mensagens privadas
             return;
         }
         mensagemNova.innerHTML += novaMsg(ultimaMsg);
@@ -96,16 +92,16 @@ function renderizaMensagens(listaMensagens){
     mensagemNova.lastElementChild.scrollIntoView();
 }
 }
-function entraSai (ultimaMsg) { 
+function entraSai (ultimaMsg) { //insere a mensagem de status
     return`<li class='inout'><span class='horas'>(${ultimaMsg.time})</span><span class='usuario'>&nbsp${ultimaMsg.from}</span><p>&nbsp${ultimaMsg.text}</p></li>`;
 }
-function novaMsg (ultimaMsg) {
+function novaMsg (ultimaMsg) { //insere a mensagem normal
     return `<li class='msg'><span class='horas'>(${ultimaMsg.time})</span><span class='usuario'>&nbsp${ultimaMsg.from}</span>&nbsppara<span class='usuario'>&nbsp${ultimaMsg.to}:</span><p>&nbsp${ultimaMsg.text}</p></li>`;
 }
 
 function enviaMsg() {
-    let texto = document.getElementById('caixa-texto').value;
-    let msg = {
+    let texto = document.getElementById('caixa-texto').value; //envia as mensagens ao clicar no
+    let msg = {                                               //icone do avião de papel
             from: `${nomeUsuario}`,
             to: "Todos",
             text: `${texto}`,
@@ -125,7 +121,7 @@ function naoChegouMensagem (erro) {
     console.log(erro);
 }
 
-function msgIgual (msg1, msg2){
+function msgIgual (msg1, msg2){         //verifica se as mensagens recebidas a cada 3 segundos são novas
     let verificação1 = msg1.text !== msg2.text;
     let verificação2 = msg1.from !== msg2.from;
     let verificação3 = msg1.type !== msg2.type;
